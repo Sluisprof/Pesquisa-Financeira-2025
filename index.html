@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Educação Financeira</title>
+    <style>
+        /* Reset e configurações básicas */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #ecf0f1;
+            height: 8px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Form Sections */
+        .form-section {
+            padding: 30px;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* Question Styles */
+        .question-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .option-card {
+            background: white;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: #2ecc71;
+            background: #e8f6f3;
+        }
+
+        .option-card input {
+            display: none;
+        }
+
+        .value-input {
+            margin-top: 15px;
+        }
+
+        .value-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 5px 15px;
+        }
+
+        .input-group span {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+            background: transparent;
+        }
+
+        /* Navigation Buttons */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-prev {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-prev:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-next {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #2980b9;
+        }
+
+        .btn-submit {
+            background: #2ecc71;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background: #27ae60;
+        }
+
+        /* Results Section */
+        .results {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .results h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .positive {
+            color: #27ae60;
+        }
+
+        .negative {
+            color: #e74c3c;
+        }
+
+        /* Teacher Panel */
+        .teacher-panel {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .teacher-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .teacher-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 Pesquisa de Educação Financeira</h1>
+            <p>Ajude-nos a entender seus hábitos financeiros e receba um planejamento personalizado</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Form Sections -->
+        <form id="financeSurvey">
+            <!-- Seção 1: Perfil Profissional -->
+            <div class="form-section active" id="section1">
+                <h2 class="section-title">👨‍💼 Perfil Profissional</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">1. Como você se vê profissionalmente no futuro?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Empregado" required>
+                            <div>👨‍💼 Empregado</div>
+                            <small>Trabalho com carteira assinada</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Empresário">
+                            <div>💼 Empresário</div>
+                            <small>Dono do próprio negócio</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Autônomo">
+                            <div>🚚 Autônomo</div>
+                            <small>Trabalho por conta própria</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Investidor">
+                            <div>📈 Investidor</div>
+                            <small>Vivo de investimentos</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Renda mensal estimada:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q1_value" min="0" step="100" placeholder="2500.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <div></div> <!-- Espaço vazio para alinhar -->
+                    <button type="button" class="btn btn-next" onclick="nextSection(1)">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Seção 2: Moradia -->
+            <div class="form-section" id="section2">
+                <h2 class="section-title">🏠 Moradia</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">2. Qual sua preferência para moradia?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Comprar" required>
+                            <div>🏡 Comprar</div>
+                            <small>Financiamento imobiliário</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Alugar">
+                            <div>📋 Alugar</div>
+                            <small>Aluguel mensal</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Casa dos Pais">
+                            <div>👨‍👩‍👧‍👦 Casa dos Pais</div>
+                            <small>Morar com a família</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Valor mensal estimado para moradia:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q2_value" min="0" step="50" placeholder="800.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="prevSection(2)">← Anterior</button>
+                    <button type="button" class="btn btn-next" onclick="nextSection(2)">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Seção 3: Transporte -->
+            <div class="form-section" id="section3">
+                <h2 class="section-title">🚗 Transporte</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">3. Qual seu meio de transporte principal?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Carro" required>
+                            <div>🚗 Carro</div>
+                            <small>Próprio ou financiado</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Moto">
+                            <div>🏍️ Moto</div>
+                            <small>Mais econômico</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Transporte Público">
+                            <div>🚌 Transporte Público</div>
+                            <small>Ônibus, metrô, etc.</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Bicicleta/Andar">
+                            <div>🚲 Bicicleta/Andar</div>
+                            <small>Mais saudável</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Valor mensal estimado para transporte:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q3_value" min="0" step="50" placeholder="300.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="prevSection(3)">← Anterior</button>
+                    <button type="button" class="btn btn-next" onclick="nextSection(3)">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Seção 4: Alimentação -->
+            <div class="form-section" id="section4">
+                <h2 class="section-title">🍽️ Alimentação</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">4. Como você costuma se alimentar?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="Cozinhar" required>
+                            <div>👨‍🍳 Cozinhar</div>
+                            <small>Preparo própria comida</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="Marmitas">
+                            <div>🍱 Marmitas</div>
+                            <small>Comida pronta caseira</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="Delivery">
+                            <div>🛵 Delivery</div>
+                            <small>Ifood, Uber Eats, etc.</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q4" value="Restaurante">
+                            <div>🍽️ Restaurante</div>
+                            <small>Refeições fora</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Valor mensal estimado para alimentação:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q4_value" min="0" step="50" placeholder="400.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="prevSection(4)">← Anterior</button>
+                    <button type="button" class="btn btn-next" onclick="nextSection(4)">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Seção 5: Estudos -->
+            <div class="form-section" id="section5">
+                <h2 class="section-title">🎓 Educação</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">5. Qual seu plano de educação?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="Ensino Superior" required>
+                            <div>🎓 Ensino Superior</div>
+                            <small>Faculdade/Universidade</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="Curso Técnico">
+                            <div>🔧 Curso Técnico</div>
+                            <small>Formação técnica</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="Cursos Livres">
+                            <div>📚 Cursos Livres</div>
+                            <small>Especializações</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q5" value="Pós-Graduação">
+                            <div>📊 Pós-Graduação</div>
+                            <small>Mestrado, MBA, etc.</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Valor mensal estimado para educação:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q5_value" min="0" step="50" placeholder="200.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="prevSection(5)">← Anterior</button>
+                    <button type="button" class="btn btn-next" onclick="nextSection(5)">Próximo →</button>
+                </div>
+            </div>
+
+            <!-- Seção 6: Hábitos Financeiros -->
+            <div class="form-section" id="section6">
+                <h2 class="section-title">💳 Hábitos Financeiros</h2>
+                
+                <div class="question-group">
+                    <div class="question-text">6. Como você faz suas compras?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="Planejadas" required>
+                            <div>📋 Planejadas</div>
+                            <small>Com lista e orçamento</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q6" value="Impulsivas">
+                            <div>🛒 Impulsivas</div>
+                            <small>Por impulso</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Valor mensal para outras despesas:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q6_value" min="0" step="50" placeholder="300.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <div class="question-text">7. Como administra seu dinheiro?</div>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="Com Planejamento" required>
+                            <div>📊 Com Planejamento</div>
+                            <small>Controlo gastos</small>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q7" value="Sem Planejamento">
+                            <div>💸 Sem Planejamento</div>
+                            <small>Gasto conforme recebo</small>
+                        </label>
+                    </div>
+                    <div class="value-input">
+                        <label>Quanto consegue economizar por mês:</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" name="q7_value" min="0" step="50" placeholder="150.00" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="prevSection(6)">← Anterior</button>
+                    <button type="button" class="btn btn-submit" onclick="submitForm()">Enviar Respostas</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Section -->
+        <div class="form-section" id="resultsSection">
+            <div class="results">
+                <h2>📊 Seu Perfil Financeiro</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div>💰 Renda Mensal</div>
+                        <div class="result-value" id="resultIncome">R$ 0,00</div>
+                    </div>
+                    <div class="result-card">
+                        <div>📤 Despesas Totais</div>
+                        <div class="result-value" id="resultExpenses">R$ 0,00</div>
+                    </div>
+                    <div class="result-card">
+                        <div>💸 Saldo Líquido</div>
+                        <div class="result-value" id="resultBalance">R$ 0,00</div>
+                    </div>
+                    <div class="result-card">
+                        <div>🎯 Economias</div>
+                        <div class="result-value" id="resultSavings">R$ 0,00</div>
+                    </div>
+                </div>
+
+                <div class="question-group">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 Resumo das Escolhas</h3>
+                    <div id="choicesSummary"></div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="btn btn-prev" onclick="showForm()">← Voltar ao Formulário</button>
+                    <button type="button" class="btn btn-submit" onclick="exportResults()">📥 Exportar Resultados</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Panel -->
+        <div class="teacher-panel">
+            <button class="teacher-btn" onclick="showTeacherPanel()">👨‍🏫 Painel do Professor</button>
+        </div>
+    </div>
+
+    <script>
+        // Configurações
+        const TOTAL_SECTIONS = 6;
+        let currentSection = 1;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            setupOptionCards();
+        });
+
+        // Navegação entre seções
+        function nextSection(current) {
+            if (validateSection(current)) {
+                document.getElementById(`section${current}`).classList.remove('active');
+                document.getElementById(`section${current + 1}`).classList.add('active');
+                currentSection = current + 1;
+                updateProgressBar();
+            }
+        }
+
+        function prevSection(current) {
+            document.getElementById(`section${current}`).classList.remove('active');
+            document.getElementById(`section${current - 1}`).classList.add('active');
+            currentSection = current - 1;
+            updateProgressBar();
+        }
+
+        function showForm() {
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('section1').classList.add('active');
+            currentSection = 1;
+            updateProgressBar();
+        }
+
+        // Validação de seção
+        function validateSection(section) {
+            const inputs = document.querySelectorAll(`#section${section} input[required]`);
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (!input.value && input.type !== 'radio') {
+                    input.style.borderColor = '#e74c3c';
+                    isValid = false;
+                } else if (input.type === 'radio') {
+                    const radioGroup = document.querySelectorAll(`input[name="${input.name}"]`);
+                    const isRadioChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    if (!isRadioChecked) {
+                        radioGroup[0].closest('.options-grid').style.border = '2px solid #e74c3c';
+                        isValid = false;
+                    } else {
+                        radioGroup[0].closest('.options-grid').style.border = 'none';
+                    }
+                } else {
+                    input.style.borderColor = '#e0e0e0';
+                }
+            });
+
+            if (!isValid) {
+                alert('Por favor, preencha todos os campos obrigatórios desta seção.');
+            }
+
+            return isValid;
+        }
+
+        // Barra de progresso
+        function updateProgressBar() {
+            const progress = ((currentSection - 1) / TOTAL_SECTIONS) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Cards de opção interativos
+        function setupOptionCards() {
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Remover seleção de outros cards do mesmo grupo
+                    const groupName = radio.name;
+                    document.querySelectorAll(`input[name="${groupName}"]`).forEach(otherRadio => {
+                        otherRadio.closest('.option-card').classList.remove('selected');
+                    });
+                    
+                    // Adicionar seleção ao card atual
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        // Envio do formulário
+        function submitForm() {
+            if (validateSection(6)) {
+                saveResponses();
+                calculateResults();
+                showResults();
+            }
+        }
+
+        // Salvar respostas
+        function saveResponses() {
+            const formData = new FormData(document.getElementById('financeSurvey'));
+            const responses = {
+                timestamp: new Date().toISOString(),
+                data: {}
+            };
+
+            // Coletar todas as respostas
+            for (let i = 1; i <= 7; i++) {
+                responses.data[`q${i}`] = formData.get(`q${i}`);
+                responses.data[`q${i}_value`] = parseFloat(formData.get(`q${i}_value`)) || 0;
+            }
+
+            // Salvar no localStorage
+            const existingData = JSON.parse(localStorage.getItem('surveyData') || '[]');
+            existingData.push(responses);
+            localStorage.setItem('surveyData', JSON.stringify(existingData));
+        }
+
+        // Calcular resultados
+        function calculateResults() {
+            const formData = new FormData(document.getElementById('financeSurvey'));
+            
+            const income = parseFloat(formData.get('q1_value')) || 0;
+            const housing = parseFloat(formData.get('q2_value')) || 0;
+            const transport = parseFloat(formData.get('q3_value')) || 0;
+            const food = parseFloat(formData.get('q4_value')) || 0;
+            const education = parseFloat(formData.get('q5_value')) || 0;
+            const otherExpenses = parseFloat(formData.get('q6_value')) || 0;
+            const savings = parseFloat(formData.get('q7_value')) || 0;
+
+            const totalExpenses = housing + transport + food + education + otherExpenses;
+            const balance = income - totalExpenses;
+
+            // Atualizar UI
+            document.getElementById('resultIncome').textContent = `R$ ${income.toFixed(2)}`;
+            document.getElementById('resultExpenses').textContent = `R$ ${totalExpenses.toFixed(2)}`;
+            document.getElementById('resultBalance').textContent = `R$ ${balance.toFixed(2)}`;
+            document.getElementById('resultBalance').className = `result-value ${balance >= 0 ? 'positive' : 'negative'}`;
+            document.getElementById('resultSavings').textContent = `R$ ${savings.toFixed(2)}`;
+
+            // Resumo das escolhas
+            const choicesSummary = document.getElementById('choicesSummary');
+            choicesSummary.innerHTML = `
+                <p><strong>Perfil:</strong> ${formData.get('q1')}</p>
+                <p><strong>Moradia:</strong> ${formData.get('q2')}</p>
+                <p><strong>Transporte:</strong> ${formData.get('q3')}</p>
+                <p><strong>Alimentação:</strong> ${formData.get('q4')}</p>
+                <p><strong>Educação:</strong> ${formData.get('q5')}</p>
+                <p><strong>Compras:</strong> ${formData.get('q6')}</p>
+                <p><strong>Administração:</strong> ${formData.get('q7')}</p>
+            `;
+        }
+
+        // Mostrar resultados
+        function showResults() {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('resultsSection').classList.add('active');
+        }
+
+        // Exportar resultados
+        function exportResults() {
+            const allData = JSON.parse(localStorage.getItem('surveyData') || '[]');
+            const csv = convertToCSV(allData);
+            downloadCSV(csv, 'pesquisa_financeira.csv');
+        }
+
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = ['Data', 'Perfil', 'Renda', 'Moradia', 'Valor_Moradia', 'Transporte', 'Valor_Transporte', 
+                           'Alimentacao', 'Valor_Alimentacao', 'Educacao', 'Valor_Educacao', 'Compras', 
+                           'Outras_Despesas', 'Administracao', 'Economias'];
+            
+            const csvRows = [headers.join(',')];
+            
+            data.forEach(item => {
+                const row = [
+                    item.timestamp,
+                    item.data.q1,
+                    item.data.q1_value,
+                    item.data.q2,
+                    item.data.q2_value,
+                    item.data.q3,
+                    item.data.q3_value,
+                    item.data.q4,
+                    item.data.q4_value,
+                    item.data.q5,
+                    item.data.q5_value,
+                    item.data.q6,
+                    item.data.q6_value,
+                    item.data.q7,
+                    item.data.q7_value
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Painel do Professor
+        function showTeacherPanel() {
+            const allData = JSON.parse(localStorage.getItem('surveyData') || '[]');
+            
+            if (allData.length === 0) {
+                alert('Nenhuma resposta coletada ainda.');
+                return;
+            }
+
+            const panelWindow = window.open('', '_blank', 'width=1200,height=800');
+            panelWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Painel do Professor - Pesquisa Financeira</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+                            .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
+                            h1 { color: #2c3e50; text-align: center; }
+                            .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+                            .stat-card { background: #3498db; color: white; padding: 20px; border-radius: 8px; text-align: center; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                            th { background: #2c3e50; color: white; }
+                            .btn { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>👨‍🏫 Painel do Professor</h1>
+                            <div class="stats">
+                                <div class="stat-card">
+                                    <h3>Total de Respostas</h3>
+                                    <div style="font-size: 2em;">${allData.length}</div>
+                                </div>
+                            </div>
+                            <button class="btn" onclick="exportAllData()">Exportar Todos os Dados</button>
+                            <button class="btn" onclick="window.print()">Imprimir Relatório</button>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Perfil</th>
+                                        <th>Renda</th>
+                                        <th>Moradia</th>
+                                        <th>Transporte</th>
+                                        <th>Saldo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${allData.map(item => `
+                                        <tr>
+                                            <td>${new Date(item.timestamp).toLocaleString('pt-BR')}</td>
+                                            <td>${item.data.q1}</td>
+                                            <td>R$ ${item.data.q1_value.toFixed(2)}</td>
+                                            <td>${item.data.q2}</td>
+                                            <td>${item.data.q3}</td>
+                                            <td>R$ ${(item.data.q1_value - item.data.q2_value - item.data.q3_value - item.data.q4_value - item.data.q5_value - item.data.q6_value).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <script>
+                            function exportAllData() {
+                                const data = ${JSON.stringify(allData)};
+                                const csv = ${convertToCSV(allData).split('\n').map(row => `"${row}"`).join('\\n')};
+                                const blob = new Blob([csv], { type: 'text/csv' });
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = 'dados_completos_pesquisa.csv';
+                                a.click();
+                            }
+                        </script>
+                    </body>
+                </html>
+            `);
+        }
+    </script>
+</body>
+</html>
